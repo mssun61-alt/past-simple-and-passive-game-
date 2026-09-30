@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Past Tense Challenge</title>
+<style>
+:root{
+  --bg1:#eaf9f8; --bg2:#f7fbff; --ink:#17324d; --muted:#638097;
+  --teal:#168b92; --teal2:#55b8b5; --blue:#3f8fd3;
+  --green:#26a269; --red:#df5a61; --gold:#f2bd4b;
+  --card:#ffffff; --shadow:0 18px 45px rgba(36,82,105,.14);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  color:var(--ink); background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  overflow-x:hidden;
+}
+body:before,body:after{
+  content:""; position:fixed; border-radius:50%; z-index:-1; opacity:.35; filter:blur(1px);
+}
+body:before{width:300px;height:300px;background:#bce9e5;top:-100px;left:-80px}
+body:after{width:380px;height:380px;background:#d7e8fa;right:-150px;bottom:-160px}
+.app{max-width:980px;margin:auto;padding:22px 18px 34px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#fff;box-shadow:var(--shadow);font-size:28px}
+h1{font-size:clamp(24px,4vw,38px);margin:0;line-height:1.05}
+.subtitle{color:var(--muted);font-size:14px;margin-top:5px}
+.soundBtn{
+  border:0;background:#fff;color:var(--ink);font-weight:800;border-radius:14px;padding:11px 14px;
+  box-shadow:0 8px 22px rgba(36,82,105,.1);cursor:pointer
+}
+.soundBtn:hover{transform:translateY(-1px)}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+.stat{background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:11px 14px;box-shadow:0 8px 22px rgba(36,82,105,.07)}
+.stat b{display:block;font-size:19px}.stat span{color:var(--muted);font-size:12px}
+.progress{height:10px;background:#dceeed;border-radius:999px;overflow:hidden;margin:8px 0 18px}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--teal),#76c7c0);border-radius:999px;transition:width .4s ease}
+.card{
+  position:relative;background:rgba(255,255,255,.96);border-radius:28px;padding:28px;
+  box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.9);overflow:hidden
+}
+.lesson{
+  display:inline-flex;align-items:center;gap:8px;background:#e2f4f2;color:#166e75;
+  font-weight:900;border-radius:999px;padding:8px 13px;font-size:13px;letter-spacing:.4px
+}
+.questionIcon{font-size:64px;text-align:center;margin:8px 0 2px;filter:drop-shadow(0 7px 5px rgba(0,0,0,.08))}
+.level{font-size:12px;font-weight:800;color:#7a8d9b;text-transform:uppercase;letter-spacing:1px;text-align:center}
+.question{font-size:clamp(22px,4vw,32px);font-weight:850;text-align:center;line-height:1.25;margin:10px auto 24px;max-width:780px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.answer{
+  border:2px solid #dce9ee;background:#fbfdfe;color:var(--ink);border-radius:18px;padding:17px 18px;
+  font-size:18px;font-weight:750;cursor:pointer;min-height:68px;text-align:left;transition:.18s ease;
+  box-shadow:0 5px 14px rgba(35,77,97,.05)
+}
+.answer:hover{border-color:#78bfc1;transform:translateY(-2px);background:#f2fbfa}
+.answer.correct{background:#e5f8ec;border-color:var(--green);color:#187b4c;animation:pop .38s ease}
+.answer.wrong{background:#fff0f1;border-color:var(--red);color:#b83d47;animation:shake .35s ease}
+.answer:disabled{cursor:default}
+.feedback{text-align:center;min-height:30px;font-weight:850;margin-top:14px;font-size:16px}
+.feedback.good{color:var(--green)} .feedback.bad{color:var(--red)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes pop{0%{transform:scale(1)}55%{transform:scale(1.035)}100%{transform:scale(1)}}
+.spark{
+ position:absolute;pointer-events:none;font-size:22px;animation:fly 900ms ease-out forwards;z-index:3
+}
+@keyframes fly{0%{opacity:0;transform:translate(0,20px) scale(.5)}20%{opacity:1}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(35deg) scale(1.25)}}
+.result{display:none;text-align:center;padding:35px 15px}
+.result .trophy{font-size:78px}
+.result h2{font-size:36px;margin:8px 0}
+.result p{font-size:18px;color:var(--muted)}
+.restart{
+ border:0;background:var(--teal);color:#fff;font-weight:900;border-radius:16px;padding:14px 24px;font-size:17px;cursor:pointer
+}
+.start{
+ position:fixed;inset:0;background:rgba(20,50,70,.28);backdrop-filter:blur(7px);display:grid;place-items:center;z-index:20;padding:20px
+}
+.startbox{max-width:560px;background:#fff;border-radius:28px;padding:34px;text-align:center;box-shadow:0 30px 80px rgba(15,50,70,.25)}
+.startbox .big{font-size:68px}.startbox h2{font-size:30px;margin:8px 0}
+.startbox p{color:var(--muted);line-height:1.6}
+.startBtn{border:0;background:linear-gradient(135deg,var(--teal),#36a9a2);color:#fff;border-radius:16px;padding:15px 28px;font-size:18px;font-weight:900;cursor:pointer}
+.note{margin-top:14px;color:#78909d;font-size:12px}
+@media(max-width:680px){
+ .app{padding:15px 12px 25px}.topbar{align-items:flex-start}.stats{gap:7px}.stat{padding:9px}
+ .answers{grid-template-columns:1fr}.card{padding:20px 15px;border-radius:22px}.questionIcon{font-size:54px}
+ .answer{font-size:16px;min-height:60px}.soundBtn{padding:9px 10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><div class="logo">📚</div><div><h1>Past Tense Challenge</h1><div class="subtitle">Past Simple & Past Passive • 30 questions</div></div></div>
+    <button class="soundBtn" id="soundBtn">🔊 Sound On</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="qNo">1 / 30</b><span>Question</span></div>
+    <div class="stat"><b id="score">0</b><span>Score</span></div>
+    <div class="stat"><b id="streak">0 🔥</b><span>Streak</span></div>
+  </div>
+  <div class="progress"><div id="bar"></div></div>
+
+  <main class="card" id="gameCard">
+    <div id="quiz">
+      <div class="lesson" id="lesson">PAST SIMPLE</div>
+      <div class="questionIcon" id="icon">⚽</div>
+      <div class="level" id="level">EASY</div>
+      <div class="question" id="question"></div>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+    </div>
+    <div class="result" id="result">
+      <div class="trophy">🏆</div>
+      <h2>Challenge Complete!</h2>
+      <p id="finalText"></p>
+      <button class="restart" onclick="restartGame()">Play Again</button>
+      <div class="note">All questions are based only on the uploaded lesson sheet.</div>
+    </div>
+  </main>
+</div>
+
+<div class="start" id="startScreen">
+  <div class="startbox">
+    <div class="big">🎯📚</div>
+    <h2>Ready for the Grammar Challenge?</h2>
+    <p>Answer 30 multiple-choice questions about the Past Simple and Past Passive. Choose the correct answer to move forward.</p>
+    <button class="startBtn" onclick="startGame()">Start Game</button>
+    <div class="note">Sound starts after you press Start because browsers block automatic audio.</div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [{"lesson": "PAST SIMPLE", "icon": "⚽", "q": "Which lesson title is shown first in the file?", "a": ["Past Simple", "Past Passive", "Present Simple", "Future Simple"], "c": 0, "level": "Easy"}, {"lesson": "PAST SIMPLE", "icon": "⚽", "q": "Which sentence is given as an example of the Past Simple?", "a": ["He played football yesterday.", "The novel was written by the author.", "The classroom was cleaned.", "The author wrote the novel."], "c": 0, "level": "Easy"}, {"lesson": "PAST SIMPLE", "icon": "🏛️", "q": "Which sentence is the museum example from the file?", "a": ["They visited the museum last week.", "They visit the museum every week.", "The museum was cleaned.", "The author wrote the museum."], "c": 0, "level": "Easy"}, {"lesson": "PAST SIMPLE", "icon": "🧩", "q": "What is the negative pattern shown for the Past Simple?", "a": ["didn't + infinitive verb", "Did + subject + infinitive verb?", "was/were + past participle", "past participle + object"], "c": 0, "level": "Easy"}, {"lesson": "PAST SIMPLE", "icon": "❓", "q": "What is the question pattern shown for the Past Simple?", "a": ["Did + subject + infinitive verb?", "didn't + infinitive verb", "was/were + past participle", "by + subject"], "c": 0, "level": "Easy"}, {"lesson": "PAST SIMPLE", "icon": "🔤", "q": "In the Past Simple question pattern, what comes after “Did + subject”?", "a": ["an infinitive verb", "a past participle", "was/were", "by + subject"], "c": 0, "level": "Easy"}, {"lesson": "PAST SIMPLE", "icon": "📅", "q": "Which word in the football example shows the past time?", "a": ["yesterday", "museum", "football", "played"], "c": 0, "level": "Easy"}, {"lesson": "PAST SIMPLE", "icon": "📅", "q": "Which phrase in the museum example shows the past time?", "a": ["last week", "the museum", "they visited", "the"], "c": 0, "level": "Easy"}, {"lesson": "PAST SIMPLE", "icon": "✏️", "q": "Which pattern matches the negative form shown in the file?", "a": ["didn't + infinitive verb", "didn't + past participle", "Did + subject + infinitive verb?", "was + past participle"], "c": 0, "level": "Medium"}, {"lesson": "PAST SIMPLE", "icon": "🔎", "q": "Which pattern matches the question form shown in the file?", "a": ["Did + subject + infinitive verb?", "didn't + infinitive verb", "was/were + past participle", "past participle + object"], "c": 0, "level": "Medium"}, {"lesson": "PAST SIMPLE", "icon": "🧠", "q": "A student wants to make a Past Simple question. Which starting word is shown in the file?", "a": ["Did", "Didn't", "Was", "By"], "c": 0, "level": "Thinking"}, {"lesson": "PAST SIMPLE", "icon": "🧠", "q": "A student wants to make a Past Simple negative. Which form is shown in the file?", "a": ["didn't + infinitive verb", "Did + subject + infinitive verb?", "was/were + past participle", "by + subject"], "c": 0, "level": "Thinking"}, {"lesson": "PAST SIMPLE", "icon": "⚽", "q": "Which sentence exactly matches the football example?", "a": ["He played football yesterday.", "He plays football yesterday.", "He was played football yesterday.", "He did played football yesterday."], "c": 0, "level": "Thinking"}, {"lesson": "PAST SIMPLE", "icon": "🏛️", "q": "Which sentence exactly matches the museum example?", "a": ["They visited the museum last week.", "They visit the museum last week.", "They were visited the museum last week.", "They did visited the museum last week."], "c": 0, "level": "Thinking"}, {"lesson": "PAST SIMPLE", "icon": "📝", "q": "Which pair contains the two Past Simple patterns shown in the file?", "a": ["Negative: didn't + infinitive; Question: Did + subject + infinitive?", "Negative: was/were + past participle; Question: by + subject", "Negative: Did + subject + infinitive?; Question: didn't + infinitive", "Negative: past participle + object; Question: was/were"], "c": 0, "level": "Thinking"}, {"lesson": "PAST PASSIVE", "icon": "📘", "q": "What is the second lesson title shown in the file?", "a": ["Past Passive", "Past Simple", "Future Passive", "Present Passive"], "c": 0, "level": "Easy"}, {"lesson": "PAST PASSIVE", "icon": "🧱", "q": "Which form of “be” is shown for the Past Passive?", "a": ["was/were", "do/does", "did", "am/is/are"], "c": 0, "level": "Easy"}, {"lesson": "PAST PASSIVE", "icon": "🔤", "q": "What form of the main verb is shown after “was/were”?", "a": ["Past Participle", "infinitive verb", "subject", "object"], "c": 0, "level": "Easy"}, {"lesson": "PAST PASSIVE", "icon": "👤", "q": "In the Past Passive formula, what part is optional?", "a": ["by + subject", "object", "was/were", "Past Participle"], "c": 0, "level": "Easy"}, {"lesson": "PAST PASSIVE", "icon": "🧩", "q": "Which order matches the Past Passive formula shown?", "a": ["Object + was/were + Past Participle + by subject (optional)", "Subject + didn't + infinitive verb", "Did + subject + infinitive verb", "Past Participle + object + did"], "c": 0, "level": "Medium"}, {"lesson": "PAST PASSIVE", "icon": "📖", "q": "Which passive sentence is shown for the novel?", "a": ["The novel was written (by the author).", "The author wrote the novel.", "The novel did write the author.", "The author was wrote the novel."], "c": 0, "level": "Easy"}, {"lesson": "PAST PASSIVE", "icon": "✍️", "q": "Which active sentence is paired with the novel passive example?", "a": ["The author wrote the novel.", "The novel was written by the author.", "The author was written the novel.", "The novel wrote the author."], "c": 0, "level": "Easy"}, {"lesson": "PAST PASSIVE", "icon": "🧹", "q": "Which passive sentence is shown for the classroom?", "a": ["The classroom was cleaned.", "The students cleaned the classroom.", "The classroom did clean the students.", "The students were cleaned the classroom."], "c": 0, "level": "Easy"}, {"lesson": "PAST PASSIVE", "icon": "👩‍🏫", "q": "Which active sentence is paired with the classroom passive example?", "a": ["The students cleaned the classroom.", "The classroom was cleaned.", "The students were cleaned the classroom.", "The classroom cleaned the students."], "c": 0, "level": "Easy"}, {"lesson": "PAST PASSIVE", "icon": "🔄", "q": "The file pairs “The author wrote the novel” with which passive sentence?", "a": ["The novel was written (by the author).", "The novel wrote the author.", "The author was written the novel.", "The novel did written the author."], "c": 0, "level": "Medium"}, {"lesson": "PAST PASSIVE", "icon": "🔄", "q": "The file pairs “The students cleaned the classroom” with which passive sentence?", "a": ["The classroom was cleaned.", "The classroom cleaned the students.", "The students were cleaned the classroom.", "The classroom did clean the students."], "c": 0, "level": "Medium"}, {"lesson": "PAST PASSIVE", "icon": "🧠", "q": "Which sentence follows the Past Passive pattern shown in the file?", "a": ["The novel was written.", "The novel did written.", "The novel was write.", "The novel did write."], "c": 0, "level": "Thinking"}, {"lesson": "PAST PASSIVE", "icon": "🧠", "q": "Which sentence follows the Past Passive pattern shown in the file?", "a": ["The classroom was cleaned.", "The classroom did cleaned.", "The classroom was clean.", "The classroom did clean."], "c": 0, "level": "Thinking"}, {"lesson": "PAST PASSIVE", "icon": "⚖️", "q": "Which sentence is Past Passive rather than the active example shown?", "a": ["The novel was written (by the author).", "The author wrote the novel.", "The students cleaned the classroom.", "They visited the museum last week."], "c": 0, "level": "Thinking"}, {"lesson": "PAST PASSIVE", "icon": "⭐", "q": "Which statement matches the complete Past Passive formula in the file?", "a": ["Object + was/were + Past Participle + by subject (optional)", "didn't + infinitive verb", "Did + subject + infinitive verb?", "Subject + past verb only"], "c": 0, "level": "Thinking"}];
+let index=0, score=0, streak=0, locked=false, soundOn=true, audioCtx=null, musicTimer=null;
+
+const $ = id => document.getElementById(id);
+const els = {lesson:$('lesson'),icon:$('icon'),level:$('level'),question:$('question'),answers:$('answers'),feedback:$('feedback'),
+qNo:$('qNo'),score:$('score'),streak:$('streak'),bar:$('bar'),quiz:$('quiz'),result:$('result'),finalText:$('finalText')};
+
+function startAudio(){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    if(soundOn && !musicTimer){
+      const notes=[261.63,329.63,392.00,329.63,293.66,349.23,440,349.23];
+      let i=0;
+      musicTimer=setInterval(()=>{
+        if(!soundOn || !audioCtx) return;
+        const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+        o.type='sine'; o.frequency.value=notes[i++%notes.length];
+        g.gain.setValueAtTime(0.0001,audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.012,audioCtx.currentTime+0.05);
+        g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.8);
+        o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.85);
+      },900);
+    }
+  }catch(e){}
+}
+function tone(kind){
+  if(!soundOn || !audioCtx) return;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=kind==='good'?'triangle':'sine';
+  const now=audioCtx.currentTime;
+  if(kind==='good'){
+    o.frequency.setValueAtTime(520,now); o.frequency.exponentialRampToValueAtTime(780,now+.16);
+  }else{
+    o.frequency.setValueAtTime(190,now); o.frequency.exponentialRampToValueAtTime(125,now+.18);
+  }
+  g.gain.setValueAtTime(.0001,now); g.gain.exponentialRampToValueAtTime(.11,now+.02); g.gain.exponentialRampToValueAtTime(.0001,now+.22);
+  o.connect(g).connect(audioCtx.destination); o.start(); o.stop(now+.24);
+}
+function startGame(){
+  $('startScreen').style.display='none';
+  startAudio();
+  renderQuestion();
+}
+$('soundBtn').addEventListener('click',()=>{
+  soundOn=!soundOn;
+  $('soundBtn').textContent=soundOn?'🔊 Sound On':'🔇 Sound Off';
+  if(soundOn) startAudio();
+});
+function renderQuestion(){
+  locked=false; els.feedback.textContent=''; els.feedback.className='feedback';
+  const d=QUESTIONS[index];
+  els.lesson.textContent=d.lesson; els.icon.textContent=d.icon; els.level.textContent=d.level.toUpperCase();
+  els.question.textContent=d.q; els.qNo.textContent=(index+1)+' / '+QUESTIONS.length;
+  els.score.textContent=score; els.streak.textContent=streak+' 🔥';
+  els.bar.style.width=((index)/QUESTIONS.length*100)+'%';
+  els.answers.innerHTML='';
+  const opts=d.a.map((text,i)=>({text,correct:i===d.c}));
+  opts.sort(()=>Math.random()-.5);
+  opts.forEach((opt)=>{
+    const b=document.createElement('button');
+    b.className='answer'; b.textContent=opt.text;
+    b.onclick=()=>chooseAnswer(b,opt.correct);
+    els.answers.appendChild(b);
+  });
+}
+function chooseAnswer(btn,correct){
+  if(locked) return;
+  if(correct){
+    locked=true; btn.classList.add('correct'); score+=10; streak++;
+    els.score.textContent=score; els.streak.textContent=streak+' 🔥';
+    els.feedback.textContent='Excellent! Correct answer! ⭐'; els.feedback.className='feedback good';
+    tone('good'); burst(btn);
+    setTimeout(()=>{
+      index++;
+      if(index<QUESTIONS.length) renderQuestion(); else finishGame();
+    },900);
+  }else{
+    btn.classList.add('wrong'); streak=0; els.streak.textContent='0 🔥';
+    els.feedback.textContent='Not quite. Try again!'; els.feedback.className='feedback bad';
+    tone('bad');
+    setTimeout(()=>btn.classList.remove('wrong'),420);
+  }
+}
+function burst(target){
+  const rect=target.getBoundingClientRect();
+  for(let i=0;i<12;i++){
+    const s=document.createElement('span'); s.className='spark'; s.textContent=['✨','⭐','✦','💫'][i%4];
+    s.style.left=(rect.left+rect.width/2)+'px'; s.style.top=(rect.top+rect.height/2)+'px';
+    s.style.setProperty('--x',((Math.random()*180)-90)+'px'); s.style.setProperty('--y',(-30-Math.random()*130)+'px');
+    document.body.appendChild(s); setTimeout(()=>s.remove(),950);
+  }
+}
+function finishGame(){
+  els.bar.style.width='100%'; els.quiz.style.display='none'; els.result.style.display='block';
+  const pct=Math.round(score/(QUESTIONS.length*10)*100);
+  els.finalText.textContent=`You scored ${score} out of ${QUESTIONS.length*10} (${pct}%). Great work!`;
+}
+function restartGame(){
+  index=0; score=0; streak=0; locked=false; els.result.style.display='none'; els.quiz.style.display='block';
+  startAudio(); renderQuestion();
+}
+</script>
+</body>
+</html>
